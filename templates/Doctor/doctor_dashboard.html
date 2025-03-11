@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Dashboard - Pneumonia Detection</title>
+  <style>
+    /* General body styling */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9; /* Light gray background */
+      color: #333;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Container for content */
+    .container {
+      background-color: #ffffff; /* White background */
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      width: 100%;
+    }
+
+    /* Header styling */
+    h1 {
+      font-size: 2.5rem;
+      color: #2c3e50; /* Dark blue-gray color */
+      margin-bottom: 20px;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      color: #3498db; /* Blue color */
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+
+    /* Form styling */
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    label {
+      font-size: 1rem;
+      color: #555;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="file"],
+    textarea {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="file"]:focus,
+    textarea:focus {
+      border-color: #3498db; /* Blue border on focus */
+    }
+
+    textarea {
+      resize: vertical; /* Allow vertical resizing */
+      min-height: 100px;
+    }
+
+    button {
+      padding: 10px;
+      background-color: #3498db; /* Blue background */
+      color: #ffffff; /* White text */
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2980b9; /* Darker blue on hover */
+    }
+
+    /* Logout button styling */
+    #logoutButton {
+      background-color: #e74c3c; /* Red background */
+      margin-top: 20px;
+    }
+
+    #logoutButton:hover {
+      background-color: #c0392b; /* Darker red on hover */
+    }
+
+    /* Responsive design */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Doctor Dashboard</h1>
+
+    <!-- Scan X-ray Image Form -->
+    <h2>Scan X-ray Image for Pneumonia</h2>
+    <form id="scanForm" enctype="multipart/form-data">
+      <label for="image">Select X-ray image:</label>
+      <input type="file" name="image" accept="image/*" required />
+
+      <label for="patient_id">Patient ID:</label>
+      <input type="text" name="patient_id" required />
+
+      <button type="submit">Scan Image</button>
+    </form>
+
+    <!-- Prescribe Medicines Form -->
+    <h2>Prescribe Medicines</h2>
+    <form id="prescriptionForm">
+      <label for="patient_id">Patient ID:</label>
+      <input type="text" name="patient_id" required />
+
+      <label for="medicine">Medicine:</label>
+      <input type="text" name="medicine" required />
+
+      <label for="notes">Notes:</label>
+      <textarea name="notes" required></textarea>
+
+      <button type="submit">Prescribe</button>
+    </form>
+
+    <!-- Logout Button -->
+    <button id="logoutButton" onclick="logout()">Logout</button>
+  </div>
+
+  <script>
+    // Logout function
+function logout() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    alert('No token found. Please log in again.');
+    window.location.href = '/login.html';
+    return;
+  }
+
+  console.log('Token:', token); // Debugging: Log the token
+
+  fetch('/logout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-access-token': token },
+  })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`HTTP error! Status: ${res.status}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      alert(data.message);
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      window.location.href = '/login.html';
+    })
+    .catch(err => {
+      alert('Error logging out. Please try again.');
+      console.error('Logout Error:', err);
+    });
+}
+  </script>
+</body>
+</html>

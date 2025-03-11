@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Dashboard - Pneumonia Detection</title>
+</head>
+<body>
+  <h1>Patient Dashboard</h1>
+
+  <button onclick="viewProfile()">Profile</button>
+  <button onclick="toggleSection('appointmentSection')">Book an Appointment</button>
+  <button onclick="toggleSection('uploadXraySection')">Upload X-ray for Diagnosis</button>
+  <button onclick="toggleSection('prescriptionSection')">View Prescriptions</button>
+  <button onclick="logout()">Logout</button>
+
+  <!-- Patient Profile Section -->
+  <div id="profileSection" style="display: none;">
+    <h2>Your Profile</h2>
+    <div id="profileDetails"></div>
+  </div>
+
+  <!-- Appointment Booking Section -->
+  
+  <button onclick="toggleAppointmentSection()">Book an Appointment</button>
+
+  <div id="appointmentSection" style="display: none;">
+      <h2>Book an Appointment</h2>
+      <form id="appointmentForm">
+          <label for="doctor">Select Doctor:</label>
+          <select id="doctor" name="doctor_id">
+              <!-- Doctors will be loaded dynamically -->
+          </select>
+          <br>
+
+          <label for="appointment_date">Select Date:</label>
+          <input type="date" id="appointment_date" name="appointment_date">
+          <br>
+
+          <button type="submit">Book Appointment</button>
+      </form>
+
+      <p id="appointmentMessage"></p>
+  </div>
+
+
+  <!-- X-ray Upload Section -->
+  <div id="uploadXraySection" style="display: none;">
+    <h2>Upload X-ray for Pneumonia Detection</h2>
+    <form id="xrayForm" enctype="multipart/form-data">
+      <input type="file" name="xray_image" accept="image/*" required />
+      <button type="submit">Upload</button>
+    </form>
+    <div id="xrayResult"></div>
+  </div>
+
+  <!-- Prescription Section -->
+  <div id="prescriptionSection" style="display: none;">
+    <h2>Your Doctor's Prescription</h2>
+    <div id="prescriptions"></div>
+  </div>
+
+  <script>
+    // Toggle Visibility of Sections
+    function toggleSection(sectionId) {
+      document.getElementById(sectionId).style.display = 'block';
+    }
+
+    // View Profile
+    function viewProfile() {
+      fetch('/patient/profile')  // No token required now
+      .then(res => res.json())
+      .then(profile => {
+        const profileDiv = document.getElementById("profileDetails");
+        profileDiv.innerHTML = `
+          <p><strong>Name:</strong> ${profile.name}</p>
+          <p><strong>Age:</strong> ${profile.age}</p>
+          <p><strong>Gender:</strong> ${profile.gender}</p>
+          <p><strong>Contact:</strong> ${profile.contact}</p>
+        `;
+        document.getElementById("profileSection").style.display = "block";
+      });
+    }
+
+    // Book Appointment
+    document.addEventListener("DOMContentLoaded", function () {
+            fetchDoctors();
+            fetchAppointments();
+            document.getElementById("appointmentForm").addEventListener("submit", bookAppointment);
+        });
+
+        function toggleAppointmentSection() {
+            let section = document.getElementById("appointmentSection");
+            section.style.display = section.style.display === "none" ? "block" : "none";
+        }
+
+        function fetchDoctors() {
+    fetch("/api/doctors")
+        .then(response => response.json())
+        .then(doctors => {
+            console.log("Doctors List:", doctors); // Debugging
+            const doctorSelect = document.getElementById("doctor");
+            doctorSelect.innerHTML = "";
+
+            if (doctors.length === 0) {
+                doctorSelect.innerHTML = "<option disabled>No doctors available</option>";
+                return;
+            }
+
+            doctors.forEach(doctor => {
+                const option = document.createElement("option");
+                option.value = doctor.id;
+                option.textContent = doctor.name + " - " + doctor.specialization;
+                doctorSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error("Error fetching doctors:", error));
+}
+
+
+        function bookAppointment(event) {
+            event.preventDefault();
+
+            const doctorId = document.getElementById("doctor").value;
+            const appointmentDate = document.getElementById("appointment_date").value;
+
+            fetch("/api/book_appointment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ doctor_id: doctorId, appointment_date: appointmentDate })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("appointmentMessage").textContent = data.message;
+                fetchAppointments(); // Refresh appointments after booking
+            })
+            .catch(error => console.error("Error booking appointment:", error));
+        }
+
+        function fetchAppointments() {
+            fetch("/api/get_appointments")
+                .then(response => response.json())
+                .then(appointments => {
+                    const tableBody = document.getElementById("appointmentsTable");
+                    tableBody.innerHTML = "";
+                    appointments.forEach(app => {
+                        const row = `<tr>
+                            <td>${app.doctor_name}</td>
+                            <td>${app.specialization}</td>
+                            <td>${app.appointment_date}</td>
+                        </tr>`;
+                        tableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => console.error("Error fetching appointments:", error));
+        }
+
+    // Upload X-ray Image
+    document.getElementById('xrayForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      fetch('/patient/upload_xray', {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(response => {
+        document.getElementById('xrayResult').innerText = `Diagnosis: ${response.result}`;
+      });
+    });
+
+    // Fetch Prescriptions
+    function fetchPrescriptions() {
+      fetch('/patient/prescriptions')
+      .then(res => res.json())
+      .then(data => {
+        const prescriptionsDiv = document.getElementById("prescriptions");
+        prescriptionsDiv.innerHTML = data.map(p => `
+          <p><strong>Doctor:</strong> ${p.doctor_name}</p>
+          <p><strong>Medicine:</strong> ${p.medicine}</p>
+          <p><strong>Date:</strong> ${p.date}</p>
+        `).join("<hr>");
+      });
+    }
+
+    // Logout Function
+    function logout() {
+      fetch('/logout', {
+        method: 'POST'
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        window.location.href = '/login.html';
+      });
+    }
+</script>
+
+
+</body>
+</html>
+

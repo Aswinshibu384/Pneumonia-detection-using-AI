@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Doctors</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>Manage Doctors</h1>
+    <table id="doctorTable">
+      <tr>
+        <th>Name</th>
+        <th>Specialization</th>
+        <th>Contact</th>
+        <th>Actions</th>
+      </tr>
+    </table>
+
+    <a href="/admin_dashboard" class="button">Back to Dashboard</a>
+
+  </div>
+
+  <script>
+    fetch('/admin/doctors')
+      .then(res => res.json())
+      .then(doctors => {
+        const table = document.getElementById("doctorTable");
+  
+        doctors.forEach(doc => {
+          const row = table.insertRow();
+          row.innerHTML = `
+            <td>${doc.name}</td>
+            <td>${doc.specialization}</td>
+            <td>${doc.contact}</td>
+            <td>
+              <button onclick="editDoctor(${doc.id})">Edit</button>
+              <button onclick="deleteDoctor(${doc.id})">Delete</button>
+            </td>`;
+        });
+      })
+      .catch(error => console.error('Error fetching doctors:', error));
+
+      function editDoctor(id) {
+  window.location.href = `edit_doctor.html?id=${id}`;
+
+
+
+    }
+  
+    function deleteDoctor(id) {
+      if (!confirm("Are you sure you want to delete this doctor?")) return;
+
+      fetch(`/admin/delete_doctor/${id}`, { method: 'DELETE' })
+        .then(res => res.json())
+        .then(response => {
+          alert(response.message);
+          location.reload();
+        })
+        .catch(error => console.error('Error deleting doctor:', error));
+    }
+  </script>
+
+</body>
+</html>

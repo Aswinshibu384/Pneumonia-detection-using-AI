@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pneumonia Detection Project</title>
+  <style>
+    /* General body styling */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f9f9f9; /* Light gray background */
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    /* Container for content */
+    .container {
+      background-color: #ffffff; /* White background */
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    /* Header styling */
+    h1 {
+      font-size: 2.5rem;
+      color: #2c3e50; /* Dark blue-gray color */
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    /* Navigation styling */
+    nav {
+      margin-top: 20px;
+    }
+
+    nav a {
+      text-decoration: none;
+      font-size: 1.1rem;
+      margin: 0 15px;
+      padding: 10px 20px;
+      border-radius: 6px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Login button styling */
+    nav a:first-child {
+      background-color: #3498db; /* Blue background */
+      color: #ffffff; /* White text */
+    }
+
+    nav a:first-child:hover {
+      background-color: #2980b9; /* Darker blue on hover */
+    }
+
+    /* Register button styling */
+    nav a:last-child {
+      background-color: #2ecc71; /* Green background */
+      color: #ffffff; /* White text */
+    }
+
+    nav a:last-child:hover {
+      background-color: #27ae60; /* Darker green on hover */
+    }
+
+    /* Responsive design */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      .container {
+        padding: 20px;
+      }
+
+      nav a {
+        font-size: 1rem;
+        margin: 0 10px;
+        padding: 8px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Welcome to the Pneumonia Detection API</h1><br>
+    <nav>
+      <a href="/login">Login</a>
+      <a href="/register">Register</a>
+    </nav>
+  </div>
+</body>
+</html>

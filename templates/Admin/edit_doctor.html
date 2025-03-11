@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Doctor</title>
+  <!-- <link rel="stylesheet" href="styles.css"> -->
+</head>
+<body>
+
+  <div class="container">
+    <h1>Edit Doctor</h1>
+    <form id="editDoctorForm">
+      <input type="hidden" id="doctorId">
+      <label>Name:</label>
+      <input type="text" id="doctorName" required>
+      
+      <label>Specialization:</label>
+      <input type="text" id="doctorSpecialization" required>
+      
+      <label>Contact:</label>
+      <input type="text" id="doctorContact" required>
+      
+      <button type="submit">Save Changes</button>
+      <a href="/manage_doctors" class="button">Cancel</a>
+    </form>
+  </div>
+
+  <script>
+    // ✅ Get doctor ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const doctorId = urlParams.get("id");
+
+    // ✅ Fetch doctor details
+    fetch(`/admin/get_doctor/${doctorId}`)
+      .then(res => res.json())
+      .then(doctor => {
+        if (doctor.message) {
+          alert(doctor.message);
+          window.location.href = "/manage_doctors";
+        } else {
+          document.getElementById("doctorId").value = doctor.id;
+          document.getElementById("doctorName").value = doctor.name;
+          document.getElementById("doctorSpecialization").value = doctor.specialization;
+          document.getElementById("doctorContact").value = doctor.contact;
+        }
+      })
+      .catch(error => console.error("Error fetching doctor details:", error));
+
+    // ✅ Handle form submission
+    document.getElementById("editDoctorForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const updatedDoctor = {
+        name: document.getElementById("doctorName").value,
+        specialization: document.getElementById("doctorSpecialization").value,
+        contact: document.getElementById("doctorContact").value
+    };
+
+    try {
+        const response = await fetch(`/admin/update_doctor/${doctorId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatedDoctor)
+        });
+
+        const result = await response.json();
+        alert(result.message); // Show success or error message
+
+        if (response.ok) {
+            window.location.href = "/manage_doctors"; // Redirect only if update is successful
+        }
+
+    } catch (error) {
+        console.error("Error updating doctor:", error);
+    }
+});
+
+  </script>
+
+</body>
+</html>

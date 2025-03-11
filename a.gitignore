@@ -1,0 +1,4 @@
+venv/
+# Ignore large model files
+pneumonia_detector.h5
+venv/
